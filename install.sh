@@ -90,7 +90,7 @@ cd /etc/Sslablk
 # System Panel စကရစ်များအား ဒေါင်းလုဒ်ရယူပြီး ဖြည်ချခြင်း
 echo "စနစ်သုံး Panel စကရစ်များကို ဒေါင်းလုဒ်ဆွဲနေပါသည်..." | lolcat
 wget https://github.com/Shangyi69/udp-custom-/raw/main/system.zip
-unzip system.zip
+unzip -j system.zip -d /etc/Sslablk/system/
 
 cd /etc/Sslablk/system
 mv menu /usr/local/bin/menu
@@ -102,6 +102,7 @@ chmod +x DelUser.sh
 chmod +x Userlist.sh
 chmod +x RemoveScript.sh
 chmod +x torrent.sh
+chmod +x infousers
 
 # =========================================================
 # AUTO DISCONNECT EXPIRED USERS SETUP (အလိုအလျောက်လိုင်းဖြတ်စနစ်)
