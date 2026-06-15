@@ -34,7 +34,7 @@ echo "Default Configuration ဖိုင်အား ဒေါင်းလုဒ
 wget "https://raw.githubusercontent.com/Shangyi69/udp-custom-/main/config.json" -O /root/udp/config.json
 chmod 644 /root/udp/config.json
 
-# Service File ဆောက်ခြင်း (Description တွင် PS UDP သို့ ပြောင်းလဲထားပါသည်)
+# Service File ဆောက်ခြင်း
 if [ -z "$1" ]; then
 cat <<EOF > /etc/systemd/system/udp-custom.service
 [Unit]
@@ -83,11 +83,76 @@ wget https://github.com/Shangyi69/udp-custom-/raw/main/system.zip -O system.zip
 unzip -o system.zip
 cd /etc/Sslablk/system
 
-# menu ဖိုင်ကို လမ်းကြောင်းရွှေ့ပြီး Permission တိုက်ရိုက်ပေးခြင်း (Error ကာကွယ်ရန်)
-mv menu /usr/local/bin/menu
+# =========================================================
+# 🛠️ [CRITICAL LOGIC] MENU ကို မြန်မာဘာသာသို့ တိုက်ရိုက်လဲလှယ်ခြင်း
+# =========================================================
+echo "Menu စနစ်အား မြန်မာဘာသာသို့ ပြောင်းလဲပြင်ဆင်နေပါသည်..." | lolcat
+
+cat <<'EOF' > /etc/Sslablk/system/menu
+#!/bin/bash
+
+RED="\e[31m"
+GREEN="\e[32m"
+YELLOW="\e[33m"
+BLUE="\e[34m"
+CYAN="\e[36m"
+ENDCOLOR="\e[0m"
+
+pub_ip=$(wget -qO- https://ipecho.net/plain ; echo)
+
+if ! [ $(id -u) = 0 ]; then
+   echo -e "${RED}ကျေးဇူးပြု၍ root privileges (sudo su) ဖြင့် Run ပါ။${ENDCOLOR}"
+   exit 1
+fi
+
+clear
+echo -e "          ░█▀▀▀█ ░█▀▀▀█ ░█─── ─█▀▀█ ░█▀▀█ 　 ░█─░█ ░█▀▀▄ ░█▀▀█ " | lolcat
+echo -e "          ─▀▀▀▄▄ ─▀▀▀▄▄ ░█─── ░█▄▄█ ░█▀▀▄ 　 ░█─░█ ░█─░█ ░█▄▄█ " | lolcat
+echo -e "          ░█▄▄▄█ ░█▄▄▄█ ░█▄▄█ ░█─░█ ░█▄▄█ 　 ─▀▄▄▀ ░█▄▄▀ ░█─── " | lolcat
+echo ""
+echo ""
+echo -e "$BLUE      ╔═══════════════════════════════════════$BLUE╗"
+echo -e "$BLUE      ║            ${YELLOW} ☆ PS UDP PANEL ☆            $BLUE ║"
+echo -e "$BLUE      ╠═══════════════════════════════════════$BLUE╣"
+echo -e "$BLUE      ║  1) အကောင့်အသစ်ဆောက်ရန် (Add User)     ║"
+echo -e "$BLUE      ║  2) အကောင့်စာရင်းများကြည့်ရန် (View Users)║"
+echo -e "$BLUE      ║  3) အကောင့်အချက်အလက်ပြင်ရန် (Edit User) ║"
+echo -e "$BLUE      ║  4) အကောင့်ဖျက်ရန် (Delete User)        ║"
+echo -e "$BLUE      ║  5) ဆာဗာအချက်အလက် (Server Info)       ║"
+echo -e "$BLUE      ║  6) Torrent ပိတ်ရန် (Torrent Blocker)  ║"
+echo -e "$BLUE      ║  7) Script ပြန်ဖျက်ရန် (Remove Script)   ║"
+echo -e "$BLUE      ║  8) အကြောင်းအရာ (About)               ║"
+echo -e "$BLUE      ║  9) စနစ်အား Restart ချရန် (Restart)    ║"
+echo -e "$BLUE      ║  0) ထွက်ရန် (Exit)                     ║"
+echo -e "$BLUE      ╚═══════════════════════════════════════╝"
+echo ""
+echo -e "       ╔═════════════════════════════════════╗"
+echo -e "       ║         MADE WITH LOVE BY PS UDP    " | lolcat
+echo -e "       ║   2024-2026 © All Rights Reserved.  ║"
+echo -e "       ╚═══════════════•⊱✦⊰•═════════════════╝"
+echo ""
+echo -ne "${GREEN}\n • နံပါတ်တစ်ခုခု ရွေးချယ်ပါ : ${ENDCOLOR}" ;read n
+
+case $n in
+  1) /etc/Sslablk/system/Adduser.sh;;
+  2) /etc/Sslablk/system/Userlist.sh;;
+  3) /etc/Sslablk/system/ChangeUser.sh;;
+  4) /etc/Sslablk/system/DelUser.sh;;
+  5) clear && screenfetch -p || echo -e "${RED}Screenfetch ထည့်သွင်းမထားပါ။${ENDCOLOR}"; echo -e "\nဆက်လုပ်ရန် Enter နှိပ်ပါ";read;menu;;
+  6) /etc/Sslablk/system/torrent.sh;;
+  7) /etc/Sslablk/system/RemoveScript.sh;;
+  8) clear; echo -e "${CYAN}PS UDP Custom Manager Script\nModified by Shangyi69\nမြန်မာနိုင်ငံသားများအတွက် သီးသန့်ပြုပြင်ထားပါသည်။${ENDCOLOR}"; echo -e "\nပြန်ထွက်ရန် Enter နှိပ်ပါ";read;menu;;
+  9) echo -e "${YELLOW}System ကို Restart ချနေပါသည်...${ENDCOLOR}"; systemctl restart udp-custom; sleep 2; menu;;
+  0) exit;;
+  *) echo -e "${RED}မှားယွင်းနေပါသည်။ နံပါတ်မှန်အောင် ပြန်ရိုက်ပါ...${ENDCOLOR}"; sleep 2; menu;;
+esac
+EOF
+
+# menu ဖိုင်ကို လမ်းကြောင်းရွှေ့ပြီး Permission ပေးခြင်း
+mv /etc/Sslablk/system/menu /usr/local/bin/menu
 chmod +x /usr/local/bin/menu
 
-# Scripts များအားလုံးကို အလုပ်လုပ်ရန် ခွင့်ပြုချက် (Permission) ပေးခြင်း
+# Scripts များအားလုံးကို Permission ပေးခြင်း
 chmod +x ChangeUser.sh
 chmod +x Adduser.sh
 chmod +x DelUser.sh
@@ -111,6 +176,14 @@ fi
 # Service များအား ပြန်လည်မောင်းနှင်ခြင်း
 systemctl daemon-reload
 systemctl enable udp-custom
+systemctl start udp-custom
+
+# ထည့်သွင်းမှု အောင်မြင်ကြောင်း ပြသခြင်း
+clear
+echo '============================================' | lolcat
+echo '  PS UDP စနစ် ထည့်သွင်းခြင်း အောင်မြင်ပါပြီ! ' | lolcat
+echo '============================================' | lolcat
+echo ' ထိန်းချုပ်ခန်း (Panel) ကို ဖွင့်ရန် "menu" ဟု ရိုက်နှိပ်ပါ ' | lolcat
 systemctl start udp-custom
 
 # ထည့်သွင်းမှု အောင်မြင်ကြောင်း ပြသခြင်း
