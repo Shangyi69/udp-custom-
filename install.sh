@@ -1,4 +1,5 @@
 #!/bin/bash
+# System Update နှင့် လိုအပ်သော Packages များ ထည့်သွင်းခြင်း
 apt update -y
 apt upgrade -y
 apt install lolcat -y
@@ -9,42 +10,42 @@ cd
 rm -rf /root/udp
 mkdir -p /root/udp
 
-# banner
+# Panel Banner ပြသခြင်း
 clear
-
 echo -e "          ░█▀▀▀█ ░█▀▀▀█ ░█─── ─█▀▀█ ░█▀▀█   ░█─░█ ░█▀▀▄ ░█▀▀█ " | lolcat
 echo -e "          ─▀▀▀▄▄ ─▀▀▀▄▄ ░█─── ░█▄▄█ ░█▀▀▄   ░█─░█ ░█─░█ ░█▄▄█ " | lolcat
 echo -e "          ░█▄▄▄█ ░█▄▄▄█ ░█▄▄█ ░█─░█ ░█▄▄█   ─▀▄▄▀ ░█▄▄▀ ░█─── " | lolcat
 echo ""
 echo ""
 echo ""
-sleep 5
-# change to time GMT+5:30
+sleep 3
 
-echo "change to time GMT+5:30 Sri Lanka"
-ln -fs /usr/share/zoneinfo/Asia/Colombo /etc/localtime
+# Timezone အား Asia/Yangon (မြန်မာစံတော်ချိန်) သို့ ပြောင်းလဲခြင်း
+echo "စနစ်၏ အချိန်အား မြန်မာစံတော်ချိန် (GMT+6:30) သို့ ပြောင်းလဲနေပါသည်..." | lolcat
+ln -fs /usr/share/zoneinfo/Asia/Yangon /etc/localtime
 
-# install udp-custom
-echo downloading udp-custom
-# 🔴 ပြင်ဆင်ပြီး LINK (၁)
+# udp-custom ကို သင့် GitHub မှ ဒေါင်းလုဒ်ဆွဲခြင်း
+echo "UDP Custom ဖိုင်အား ဒေါင်းလုဒ်ဆွဲနေပါသည်..." | lolcat
 wget "https://github.com/Shangyi69/udp-custom-/raw/main/udp-custom-linux-amd64" -O /root/udp/udp-custom
 chmod +x /root/udp/udp-custom
 
-echo downloading default config
-# 🔴 ပြင်ဆင်ပြီး LINK (၂)
+# config.json ကို ဒေါင်းလုဒ်ဆွဲခြင်း
+echo "Default Configuration ဖိုင်အား ဒေါင်းလုဒ်ဆွဲနေပါသည်..." | lolcat
 wget "https://raw.githubusercontent.com/Shangyi69/udp-custom-/main/config.json" -O /root/udp/config.json
 chmod 644 /root/udp/config.json
 
+# Service File ဆောက်ခြင်း (Description တွင် PS UDP သို့ ပြောင်းလဲထားပါသည်)
 if [ -z "$1" ]; then
 cat <<EOF > /etc/systemd/system/udp-custom.service
 [Unit]
-Description=UDP Custom by ePro Dev. Team and modify by Shangyi69
+Description=UDP Custom Server Modified by PS UDP
 
 [Service]
 User=root
 Type=simple
 ExecStart=/root/udp/udp-custom server
-WorkingDirectory=/root/udp/\nRestart=always
+WorkingDirectory=/root/udp/
+Restart=always
 RestartSec=2s
 
 [Install]
@@ -53,13 +54,14 @@ EOF
 else
 cat <<EOF > /etc/systemd/system/udp-custom.service
 [Unit]
-Description=UDP Custom by ePro Dev. Team and modify by Shangyi69
+Description=UDP Custom Server Modified by PS UDP
 
 [Service]
 User=root
 Type=simple
 ExecStart=/root/udp/udp-custom server -exclude $1
-WorkingDirectory=/root/udp/\nRestart=always
+WorkingDirectory=/root/udp/
+Restart=always
 RestartSec=2s
 
 [Install]
@@ -68,22 +70,24 @@ EOF
 fi
 
 clear
-echo '    Install Custom UDP Manager   ' | lolcat
+echo '    PS Custom UDP Manager ကို ထည့်သွင်းနေပါသည်   ' | lolcat
+sleep 3
 
-echo ''
-echo ''
-echo ''
-sleep 5
 cd $HOME
-mkdir /etc/Sslablk
+mkdir -p /etc/Sslablk
 cd /etc/Sslablk
 
-# 🔴 ပြင်ဆင်ပြီး LINK (၃)
-wget https://github.com/Shangyi69/udp-custom-/raw/main/system.zip
-unzip system.zip
+# Panel Menu စနစ်များ (system.zip) ကို ဒေါင်းလုဒ်ဆွဲခြင်း
+echo "စနစ်ပတ်ဝန်းကျင် ဖိုင်တွဲများကို ဒေါင်းလုဒ်ဆွဲနေပါသည်..." | lolcat
+wget https://github.com/Shangyi69/udp-custom-/raw/main/system.zip -O system.zip
+unzip -o system.zip
 cd /etc/Sslablk/system
-mv menu /usr/local/bin
-cd /etc/Sslablk/system
+
+# menu ဖိုင်ကို လမ်းကြောင်းရွှေ့ပြီး Permission တိုက်ရိုက်ပေးခြင်း (Error ကာကွယ်ရန်)
+mv menu /usr/local/bin/menu
+chmod +x /usr/local/bin/menu
+
+# Scripts များအားလုံးကို အလုပ်လုပ်ရန် ခွင့်ပြုချက် (Permission) ပေးခြင်း
 chmod +x ChangeUser.sh
 chmod +x Adduser.sh
 chmod +x DelUser.sh
@@ -92,23 +96,26 @@ chmod +x RemoveScript.sh
 chmod +x torrent.sh
 
 # =========================================================
-# AUTO DISCONNECT EXPIRED USERS SETUP (ထည့်သွင်းပြင်ဆင်ချက်)
+# အကောင့်သက်တမ်းကုန်သူများအား အလိုအလျောက်လိုင်းဖြတ်မည့် စနစ် (Auto-Kill Setup)
 # =========================================================
-echo ' Setting up Auto-Disconnect for Expired Users... ' | lolcat
+echo ' သက်တမ်းကုန် User များအား အလိုအလျောက်လိုင်းဖြတ်မည့် စနစ်ကို ထည့်သွင်းနေပါသည်... ' | lolcat
 
-# 🔴 ပြင်ဆင်ပြီး LINK (၄) - CheckExpired.sh ဖိုင်ကို လှမ်းဒေါင်းယူခြင်း
 wget "https://raw.githubusercontent.com/Shangyi69/udp-custom-/main/CheckExpired.sh" -O /etc/Sslablk/system/CheckExpired.sh
 chmod +x /etc/Sslablk/system/CheckExpired.sh
 
-# မိနစ်တိုင်း နောက်ကွယ်ကနေ Auto မောင်းနှင်ရန် Crontab ထဲသို့ ထည့်ခြင်း
+# Linux Crontab Task ထဲသို့ (၁ မိနစ်လျှင် တစ်ကြိမ်) Auto စစ်ဆေးရန် ထည့်သွင်းခြင်း
 if ! crontab -l 2>/dev/null | grep -q "CheckExpired.sh"; then
     (crontab -l 2>/dev/null; echo "*/1 * * * * /etc/Sslablk/system/CheckExpired.sh") | crontab -
 fi
 
+# Service များအား ပြန်လည်မောင်းနှင်ခြင်း
 systemctl daemon-reload
 systemctl enable udp-custom
 systemctl start udp-custom
 
+# ထည့်သွင်းမှု အောင်မြင်ကြောင်း ပြသခြင်း
 clear
-echo '  Installation Completed! ' | lolcat
-echo ' Type "menu" to open control panel ' | lolcat
+echo '============================================' | lolcat
+echo '  PS UDP စနစ် ထည့်သွင်းခြင်း အောင်မြင်ပါပြီ! ' | lolcat
+echo '============================================' | lolcat
+echo ' ထိန်းချုပ်ခန်း (Panel) ကို ဖွင့်ရန် "menu" ဟု ရိုက်နှိပ်ပါ ' | lolcat
